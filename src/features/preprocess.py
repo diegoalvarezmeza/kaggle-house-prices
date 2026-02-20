@@ -33,20 +33,25 @@ class Preprocessor:
         top_features = target_corr.index[1:n_best_correlation+1].tolist()  # Exclude target itself
         return top_features
     
-    def preprocess(self, n_best_correlation=10, na_threshold=0.5):
+    def get_features(self, df):
+        """Get the final list of features after preprocessing."""
+        numerical_cols, categoric_cols = self.split_numerical_categoric(df)
+        top_numerical_features = self.select_numerical_features(df, n_best_correlation=10)
+        return categoric_cols, top_numerical_features
+    
+    def preprocess(self):
         """Full preprocessing pipeline."""
         train_data, _ = self.load()
         
         # Drop columns with too many missing values
-        train_data = self.drop_columns_na(train_data, threshold=na_threshold)
+        train_data = self.drop_columns_na(train_data, threshold=0.5)
 
         numerical_cols, categoric_cols = self.split_numerical_categoric(train_data)
     
         # Select top numerical features
-        top_numerical_features = self.select_numerical_features(train_data, n_best_correlation)
+        top_numerical_features = self.select_numerical_features(train_data, n_best_correlation=10)
 
-        return numerical_cols, top_numerical_features
+        return train_data, categoric_cols, top_numerical_features
     
-        
-
-        
+    
+    
